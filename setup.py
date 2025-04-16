@@ -1,4 +1,4 @@
-"""Python setup.py for ukp_project_template package"""
+"""Python setup.py for generating_impact_summaries package"""
 import io
 import os
 from setuptools import find_packages, setup
@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 
 def read(*paths, **kwargs):
     """Read the contents of a text file safely.
-    >>> read("ukp_project_template", "VERSION")
+    >>> read("generating_impact_summaries", "VERSION")
     '0.1.0'
     >>> read("README.md")
     ...
@@ -30,15 +30,15 @@ def read_requirements(path):
 
 
 setup(
-    name="ukp_project_template",
-    url="https://github.com/UKPLab/ukp-project-template/",
+    name="generating_impact_summaries",
+    url="https://github.com/UKPLab/generating-impact-summaries/",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
     author="author_name",
     packages=find_packages(exclude=["tests", ".github"]),
     install_requires=read_requirements("requirements.txt"),
     entry_points={
-        "console_scripts": ["ukp_project_template = ukp_project_template.__main__:main"]
+        "console_scripts": ["generating_impact_summaries = generating_impact_summaries.__main__:main"]
     },
     extras_require={"test": read_requirements("requirements-dev.txt")},
 )
