@@ -84,6 +84,10 @@ If you use this code or data in your research, please cite our paper:
 
 Hiba Arnaout, Noy Sternlicht, Tom Hope, Iryna Gurevych.
 
+### License
+ 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 ### Disclaimer
 
 > This repository contains experimental software and is published for the sole purpose of giving additional background details on the respective publication. 
