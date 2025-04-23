@@ -1,0 +1,33 @@
+**Task:** Verify the faithfulness of a claim regarding the paper "{{PAPER_NAME}}". It is faithful if it can be supported by one or more of the paper's citations from the provided list. Each citation is formatted as <title>:citation_text, where the title indicates the title of the citing paper.
+
+**Claim to Verify:**
+<claim>
+{{CLAIM}}
+</claim>
+
+**Citation List:**
+<citations>
+{{SOURCES}}
+</citations>
+
+**Steps to Complete the Task:**
+
+1. Understand the claim and its specified time period.
+2. Review each citation in the provided list.
+3. Determine if the claim can be supported by any single citation or a combination of citations.
+4. If the claim is supported, identify the relevant citations that support it.
+5. If the claim cannot be supported or is contradicted by the citations, determine it as unfaithful.
+
+**Response Format:**
+
+- **Analysis:** <analysis> [Provide your analysis here] </analysis>
+- **Answer:** <answer> [yes/no] </answer>
+- **Proof:** <proof> [List the exact text of the citations that support the claim, or "none" if unfaithful] </proof>
+
+**Additional Guidelines:**
+
+- The answer should be "yes" or "no" only.
+- In the proof section, include only the exact text of relevant citations without explanations.
+- List all necessary citations if multiple are needed to support the claim.
+- If the claim is unfaithful, state "none" in the proof section.
+- Avoid additional commentary outside the specified format.
