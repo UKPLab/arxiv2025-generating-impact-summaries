@@ -22,6 +22,8 @@ Understanding the impact of scientific publications is crucial for identifying b
                         correlation on subjective metrics such as insightfulness. Expert feedback from professors
                         reveals strong interest in these summaries and suggests future improvements.
 
+This repo contains the code and data used to produce the experiments in this paper. Namely: 1) to generate fine-grained intents of citation contexts and 2) generate impact summaries based on the classified intents.
+
 
 Contact person: [Hiba Arnaout](mailto:hiba.arnaout@tu-darmstadt.de) 
 
