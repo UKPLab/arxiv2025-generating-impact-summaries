@@ -13,11 +13,14 @@
 
 
 
-
-Understanding how scientific publications influence their fields is crucial for identifying breakthroughs and guiding future research. However, traditional metrics like citation counts fail to capture the nuanced ways a paper contributes to its field.
-
-This repository contains code and data for [our paper](https://anonymous.4open.science/r/impact-summary-8B64), which aims to address this challenge. We propose a new task: creating detailed, time-sensitive impact summaries that track how researchers use a paper by analyzing its citations.
-If you use our work please cite us as described [here](#citation).
+Understanding the impact of scientific publications is crucial for identifying breakthroughs and
+                        guiding future research. Traditional metrics like citation counts often miss the nuanced ways a
+                        paper contributes to its field. In this work, we propose a new task: generating nuanced,
+                        expressive, and time-aware impact summaries that capture both praise (confirmation citations)
+                        and critique (correction citations) through the evolution of fine-grained citation intents. We
+                        introduce an evaluation framework tailored to this task, showing moderate to strong human
+                        correlation on subjective metrics such as insightfulness. Expert feedback from professors
+                        reveals strong interest in these summaries and suggests future improvements.
 
 
 Contact person: [Hiba Arnaout](mailto:hiba.arnaout@tu-darmstadt.de) 
