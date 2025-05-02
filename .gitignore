@@ -140,3 +140,4 @@ generating_impact_summaries/sketch*
 
 # pycharm
 .idea/
+static/.DS_Store
