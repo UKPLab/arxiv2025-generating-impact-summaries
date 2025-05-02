@@ -137,3 +137,6 @@ dmypy.json
 # Project files
 sketch*
 generating_impact_summaries/sketch*
+
+# pycharm
+.idea/
