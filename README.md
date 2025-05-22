@@ -73,15 +73,14 @@ You can rerun the data preprocessing by executing `scripts/ablation_summaries_pr
 If you use this code or data in your research, please cite our paper:
 
 ```bibtex
-@article{XXX,
-  title={In-depth Research Impact Summarization through Fine-Grained Temporal Citation Analysis},
-  author={Arnaout, Hiba and Sternlicht, Noy and Hope, Tom and Gurevych, Iryna},
-  journal={Journal Name},
-  volume={X},
-  number={Y},
-  pages={ZZ--ZZ},
-  year={2025},
-  publisher={Publisher}
+@misc{arnaout2025indepthresearchimpactsummarization,
+      title={In-depth Research Impact Summarization through Fine-Grained Temporal Citation Analysis}, 
+      author={Hiba Arnaout and Noy Sternlicht and Tom Hope and Iryna Gurevych},
+      year={2025},
+      eprint={2505.14838},
+      archivePrefix={arXiv},
+      primaryClass={cs.DL},
+      url={https://arxiv.org/abs/2505.14838}, 
 }
 ```
 
