@@ -1,112 +1,108 @@
-!pip install xlsxwriter
-!pip install jsonlines
 import csv
 import json
 import jsonlines
 import random
+import pandas as pd
+from openai import OpenAI
+from datetime import datetime
+
+client = OpenAI(api_key="KEY")
+
+def lmcall(model, temperature, user_prompt):
+    response = client.chat.completions.create(
+        model=model,
+        temperature=temperature,
+        max_tokens=80,
+        presence_penalty=0,
+        frequency_penalty=0,
+        messages=[{"role": "user", "content": user_prompt}],
+    )
+    return response.choices[0].message.content.strip()
 
 ks = [50]
-runs = 3
 examples = []
-
-with open('/data/training_examples_k=50.csv', mode ='r', encoding="ISO-8859-1")as file:
-  csvFile = csv.reader(file)
-  for line_as_list in csvFile:
-    examples.append(line_as_list)
-
-path = 'path/to/input/'
-path2 = 'path/to/output/'
-
 results = []
-test_data = []
-file = open(path+str(f), 'r')
-print(str(f))
-citations = file.readlines()
 
-def lmcall(model, temporature, prompt):
-  '''
-  call to llm
-  '''
+with open("training_examples_k=50.csv", mode="r", encoding="ISO-8859-1") as file:
+    csvFile = csv.reader(file)
+    for line_as_list in csvFile:
+        examples.append(line_as_list)
 
-def main():
-  for cit in citations:
-    json_object = json.loads(cit)
-    test_instance = {}
-    if "context" not in json_object:
-      continue
-    if len(json_object["context"]) == 0:
-      continue
+df_test = pd.read_excel("PST.xlsx")
 
-    test_instance["cited_paper_id"] = json_object["cited_id"]
-    test_instance["cited_paper_title"] = json_object["cited_title"]
-    test_instance["cited_paper_year"] = json_object["cited_year"]
+for j, row in df_test.iterrows():
+    print(str(j), flush=True)
+    #if j==10:
+    #	break
+    temp = row.to_dict()
 
-    test_instance["citing_paper_id"] = json_object["citing_id"]
-    test_instance["citing_paper_title"] = json_object["citing_title"]
-    test_instance["citing_paper_year"] = json_object["citing_year"]
-    test_instance["context"] = ""
-    for c in json_object["context"]:
-      test_instance["context"] = test_instance["context"] + c
-    test_data.append(test_instance)
-
-  for test_instance in test_data: 
     for k in ks:
-      temp = test_instance.copy()
-      for run in range(0, runs):
-        random.shuffle(examples)
-        examples_of_run = examples[:k]
-        prompt ="""
-        A citation context in a scientific paper refers to the specific part of a paper p′ where
-        another paper p is mentioned, including the surrounding sentences or paragraphs that
-        explain how and why p is relevant to p′.
-        A citation context with an impact-revealing intent is a type of citation in scientific
-        writing that highlights the significance or influence of a previously published work, often
-        emphasizing its contribution or importance to the current research or the broader field,
-        e.g., its role in inspiring, motivating, supporting, filling gaps, critically analyzing, or
-        contributing methods, tools, data, extensions, or benchmarks for the current research.
-        Other types of intents include a reference to prior work in a scientific paper that provides
-        background or context without emphasizing the impact, significance, or influence of
-        the cited work. It acknowledges the source in a routine or supporting role rather than
-        showcasing its importance to the research.
-        Given a citation context, describe, in a few words, the intention behind this citation phrase.
-        Then, decide on the category of this intention. In particular, whether the intention behind
-        this citation phrase is impact-revealing or not (i.e., incidental or that there isn’t enough
-        information to realize the real intention behind it). For the intention category, only return
-        one of the following two labels impact-revealing or other .
-        Below are examples:
-        """
-        for ex in examples_of_run:
-          prompt+="<"+ex[1]+"> => <\""+ex[2]+"\"|\""+ex[3]+"\">\n"
+        predictions = []
+        temp["resp"] = ""
 
-        temp["prompt_run"+str(run)] = "<"+temp["context"]+"> =>"
+        for run in range(3):
+            examples_of_run = sorted(random.sample(examples, k), key=lambda x: x[3]) #sort by label, shuffle within label
 
-        try:
-          response=lmcall("gpt4omini", 0, prompt+"<"+temp["context"]+"> =>")
-          resp = str(response.content)
-          temp["response"+str(run)] = resp
-          #print(resp)
-          resp = resp.replace("\"", "").replace(">","").replace("<","")
-          if len(resp.split("|"))>=2:
-            temp["intentclass"+str(run)] = resp.split("|")[1].strip()
-            temp["intentdescr"+str(run)] = resp.split("|")[0].strip()
-          elif len(resp.split("=>"))>=2:
-            temp["intentclass"+str(run)] = resp.split("=>")[1].strip()
-            temp["intentdescr"+str(run)] = resp.split("=>")[0].strip()
-          else:
-            temp["intentclass"+str(run)] = "ERROR"
-            temp["intentdescr"+str(run)] = "ERROR"
+            user_prompt = """
+			A citation context in a scientific paper refers to the specific part of a paper p' where another paper p is mentioned.
+			A citation is "impact-revealing" only if the cited work directly contributed to, influenced, or was foundational for the new research for example, if it: 
+			provided a method, model, or framework the current study uses or extends, solved a problem that the current study builds on, inspired or shaped the current work's direction.
+			If the citation merely compares, lists, defines terms, summarizes prior models, or reviews related work, label it as "other" even if it sounds positive or important.
+			Return the output strictly in JSON format: {"description": "<few words>", "label": "impact-revealing" or "other"}
+			Below are examples:
+			"""
 
-          results.append(temp)
-        except:
-          temp["response"+str(run)]= ""
-          temp["intentclass"+str(run)] = ""
-          temp["intentdescr"+str(run)] = ""
-          results.append(temp)
+            for ex in examples_of_run:
+                user_prompt += (
+                    f"<{ex[1]}> => "
+                    f'{{"description": "{ex[2]}", "label": "{ex[3]}"}}\n'
+                )
 
-  with jsonlines.open(path2+str(f), 'w') as writer:
+            # adding gold examples from each class
+            user_prompt += """
+			<Eisenberg (2008) integrates digital tools into information literacy and inspires new research directions.> => {"description": "shows foundational influence of Eisenberg's model", "label": "impact-revealing"}
+			<Eisenberg (2008) discusses the use of digital tools for education.> => {"description": "general background mention", "label": "other"}
+			"""
+
+            context = temp["SS_contexts"].replace("###", " ").strip()
+            context = " ".join(context.split())
+            user_prompt += f"<{context}> => "
+
+            try:
+                resp = lmcall("gpt-4o-mini", 0.0, user_prompt)
+                temp["resp"] += "\n" + resp
+
+                #parse response
+                label = None
+                try:
+                    data = json.loads(resp)
+                    label = data.get("label", "").lower()
+                except Exception:
+                    resp_lower = resp.lower()
+                    if '"impact-revealing"' in resp_lower or "'impact-revealing'" in resp_lower:
+                        label = "impact-revealing"
+                    elif '"other"' in resp_lower or "'other'" in resp_lower:
+                        label = "other"
+
+                predictions.append(label)
+
+            except Exception as e:
+                print(f"Run {run} failed: {e}")
+
+        if len(predictions) == 3:
+            temp["our_intent"] = (
+                "impact-revealing"
+                if predictions.count("impact-revealing") > predictions.count("other")
+                else "other"
+            )
+        else:
+            temp["our_intent"] = "error"
+
+        results.append(temp)
+
+
+f = f"output_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jsonl"
+with jsonlines.open(f, "w") as writer:
     writer.write_all(results)
-  import pandas
-  pandas.read_json(path2+str(f), lines=True).to_excel(path2+str(f).replace('.jsonl','')+".xlsx", engine='xlsxwriter')
 
-if __name__ == '__main__':
-  main()
+pd.read_json(f, lines=True).to_excel(f.replace(".jsonl", "") + ".xlsx", engine="xlsxwriter")
